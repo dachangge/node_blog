@@ -6,5 +6,6 @@ import User from '../controller/user/user';
 router.get('/show', User.getAdminInfo);
 router.get('/query', User.queryAdmins);
 router.post('/create', User.createUser);
+router.post('/checkUser', User.checkUser);
 
 module.exports = router;

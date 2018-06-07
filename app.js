@@ -3,7 +3,8 @@ import router from './routes/index';
 import bodyParser from 'body-parser';
 import connectMongo from 'connect-mongo';
 import cookieParser from 'cookie-parser';
-import expressSession from 'express-session';
+import session from 'express-session';
+import cors from 'cors';
 
 import db from './mongodb/db';
 
@@ -22,23 +23,35 @@ app.all('*', (req, res, next) => {
     }
 });
 
-const MongoStore =  connectMongo(expressSession);
-app.use(cookieParser());
-app.use(expressSession({
-    name: 'vueblog',
-    secret: 'user_id',
+app.use(cors({
+        credentials: true,
+        origin: 'http://localhost:8081', // web前端服务器地址
+}))
+const MongoStore =  connectMongo(session);
+app.use(cookieParser('SID'));
+app.use(session({
+    name: 'SID',
+    secret: 'SID',
     resave: true,
     saveUninitialized: false,
-
+    cookie: {
+        httpOnly: true,
+        secure:   false,
+        maxAge:   7 * 24 * 60 * 60 * 1000,
+    },
+    store: new MongoStore({
+        url: 'mongodb://localhost:27017/demo'
+    })
 
 }))
 
 
+
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-    res.send('hello world');
-});
+// app.get('/', (req, res) => {
+//     res.send('hello world');
+// });
 router(app);
 
 app.listen(3000, () => {

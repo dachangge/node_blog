@@ -37,6 +37,19 @@ class User {
         }
 
     }
+    async checkUser (req, res, next) {
+        if(req.session && req.session.userid){
+            let user = await UserModel.findOne({_id: req.session.userid});
+            if(user){
+                res.send(new BaseResult({code: 1, description: '当前已经登陆',result: user}));
+            }else{
+                res.send(new BaseResult({code: 400, description: '当前未登陆'}));
+            }
+        }
+        else{
+            res.send(new BaseResult({code: 400, description: '当前未登陆'}));
+        }
+    }
     async createUser (req, res, next) {
         try{
             if(!req.body.user_name){
@@ -54,8 +67,9 @@ class User {
         }
         try{
             let user = await UserModel.findOne({user_name: req.body.user_name});
-            if(user)
-                res.send(new BaseResult({code: 0, description: '用户名已被注册'}))
+            if(user){
+                res.send(new BaseResult({code: 0, description: '用户名已被注册'}));
+            }
             else {
                 UserModel.create({
                     user_name: req.body.user_name,
@@ -65,10 +79,9 @@ class User {
                     create_time: new Date()
                 }, (err, docs) => {
                     if (err) {
-                        console.log(err);
                         res.send(new BaseResult({code: 0, description: '服务器异常'}));
                     } else {
-                        req.session.user_id = docs._id;
+                        req.session.userid = docs._id;
                         res.send(new BaseResult({code: 1, description: '注册成功', result: docs}));
                     }
                 })
