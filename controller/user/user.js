@@ -4,37 +4,57 @@ class User {
     constructor() {
         this.createUser = this.createUser.bind(this);
     }
-    async getAdminInfo (req, res, next) {
-        console.log(req.session.user_id)
-        if(req.body && req.body._id) {
-            let info = await UserModel.findOne({_id: req.params._id});
-            res.send(info);
-            return
+    async saveUser (req, res, next) {
+        try {
+            if (!req.body.user_name)
+                throw new Error('用户名不能为空');
+            else if (!req.body.true_name)
+                throw new Error('真实姓名不能为空');
+        }catch(err){
+            res.send(new BaseResult({code: 0, description: err.message}));
         }
-        res.send({code : 1})
-        // }
-        // else
-        //     res.send({code: '0000', description: 'success'})
-    }
-    async queryAdmins (req, res, next){
-        try{
-            let admins = await UserModel.find();
-            res.send(new BaseResult({
-                code: 1,
-                description: '查询成功',
-                result: {
-                    count: admins.length,
-                    list: admins
+        UserModel.update({_id: req.session.userid},{
+            user_name: req.body.user_name,
+            true_name: req.body.true_name,
+            phone: req.body.phone,
+            autograph: req.body.autograph,
+        }, (err, docs) => {
+            if(err){
+                res.send(new BaseResult({code: 0, description: '修改用户信息失败'}));
+            }else{
+                console.log(docs);
+                if(docs.n === 0){
+                    res.send(new BaseResult({code: 0, description: '系统异常'}))
                 }
-            }));
+                else if(docs.n === 1){
+                    res.send(new BaseResult({code: 1, description: '用户信息修改成功', result: docs}))
+                }
+            }
+        })
+
+    }
+    async changePsd(req, res, next) {
+        try {
+            if (!req.body.old_psd)
+                throw new Error('必须输入当前密码');
+            else if (!req.body.new_psd)
+                throw new Error('必须输入新密码');
+        }catch(err){
+            res.send(new BaseResult({code: 0, description: err.message}));
         }
-        catch (e) {
-            console.log(e);
-            res.send(new BaseResult({
-                code: 0,
-                description: '获取数据失败',
-            }))
-        }
+        UserModel.update({_id: req.session.userid,pass_word: req.body.old_psd},{pass_word: req.body.new_psd},(err,docs) => {
+            if(err){
+                res.send(new BaseResult({code: 0, description: '修改用户信息失败'}));
+            }else{
+                console.log(docs);
+                if(docs.n === 0){
+                    res.send(new BaseResult({code: 0, description: '原密码不正确'}))
+                }
+                else if(docs.n === 1){
+                    res.send(new BaseResult({code: 1, description: '修改密码成功', result: docs}))
+                }
+            }
+        });
 
     }
     async checkUser (req, res, next) {
