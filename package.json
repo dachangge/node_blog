@@ -21,10 +21,12 @@
     "esutils": "^2.0.2",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
+    "formidable": "^1.2.1",
     "home-or-tmp": "^3.0.0",
     "lodash": "^4.17.10",
     "mkdirp": "^0.5.1",
     "mongoose": "^5.1.4",
+    "qiniu": "^7.1.7",
     "source-map-support": "^0.5.6"
   },
   "devDependencies": {

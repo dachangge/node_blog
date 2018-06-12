@@ -112,6 +112,42 @@ class User {
         }
         //
     }
+    async userLogin(req, res, next) {
+        console.log(req.body)
+        try{
+            if(!req.body.user_name)
+                throw new Error('用户名不能为空');
+            if(!req.body.pass_word)
+                throw new Error('密码不能为空');
+        }catch(err){
+            res.send(new BaseResult({code: 0, description: err.message}))
+        }
+        try{
+            UserModel.findOne({user_name: req.body.user_name, pass_word: req.body.pass_word},(err,doc) => {
+                if(err){
+                    res.send(new BaseResult({code: 0, description: err.message}))
+                }else{
+                    console.log(doc)
+                    req.session.userid = doc._id;
+                    res.send(new BaseResult({code: 1, description: '成功登录'}))
+                }
+            });
+        }catch(err){
+            res.send(new BaseResult({code: 0, description: '服务器异常'}))
+
+        }
+    }
+    async userLoginOut(req, res, next){
+        try{
+            req.session.destroy(function () {
+                res.clearCookie('SID',{});
+                res.send(new BaseResult({code: 1,description: '退出登录'}));
+            })
+        }catch (e) {
+            res.send(new BaseResult({code: 0, description: '系统异常'}))
+        }
+
+    }
 
 }
 export default new User();

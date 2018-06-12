@@ -7,5 +7,7 @@ router.post('/create', User.createUser);
 router.post('/checkUser', User.checkUser);
 router.post('/saveUser', User.saveUser);
 router.post('/changePsd', User.changePsd);
+router.post('/login', User.userLogin);
+router.post('/loginOut', User.userLoginOut);
 
 module.exports = router;

@@ -9,7 +9,7 @@ const commentSchma = new Schema({
     tags:[String],
     likes:[ObjectId],
     replays:[ObjectId],
-    type: [Stirng]
+    type: Stirng
 });
 
 
