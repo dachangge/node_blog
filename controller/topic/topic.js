@@ -1,6 +1,7 @@
 import {BaseResult} from "../../prototype/baseResult";
 import TopicModel from '../../models/topic/topic'
-class Topic{
+import {BaseComponent} from "../../prototype/baseComponent";
+class Topic extends BaseComponent{
     async insertTopic(req, res , next){
         try{
             if(!req.body.type){
