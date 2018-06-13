@@ -1,5 +1,6 @@
 import UserModel from '../../models/user/user'
 import {BaseResult} from "../../prototype/baseResult";
+import CommentModel from "../../models/comment/comment";
 class User {
     constructor() {
         this.createUser = this.createUser.bind(this);
@@ -13,25 +14,20 @@ class User {
         }catch(err){
             res.send(new BaseResult({code: 0, description: err.message}));
         }
-        UserModel.update({_id: req.session.userid},{
+        let user = await UserModel.findOneAndUpdate({_id: req.session.userid},{
             user_name: req.body.user_name,
             true_name: req.body.true_name,
             phone: req.body.phone,
             autograph: req.body.autograph,
-        }, (err, docs) => {
-            if(err){
-                res.send(new BaseResult({code: 0, description: '修改用户信息失败'}));
+        })
+        console.log(user);
+        CommentModel.updateMany({user_id: req.session.userid},{userMsg: user},(err,doc) => {
+            if(!err){
+                res.send(new BaseResult({code: 1, description: '用户信息修改成功', result: user}));
             }else{
-                console.log(docs);
-                if(docs.n === 0){
-                    res.send(new BaseResult({code: 0, description: '系统异常'}))
-                }
-                else if(docs.n === 1){
-                    res.send(new BaseResult({code: 1, description: '用户信息修改成功', result: docs}))
-                }
+                res.send(new BaseResult({code: 0, description: '修改用户信息失败'}));
             }
         })
-
     }
     async changePsd(req, res, next) {
         try {

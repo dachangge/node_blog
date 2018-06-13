@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
 const DB_URL = 'mongodb://localhost:27017/demo';
-
 mongoose.connect(DB_URL);
+mongoose.Promise = global.Promise;
 
 /**
  * 连接成功

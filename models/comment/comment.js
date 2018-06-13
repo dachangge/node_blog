@@ -3,16 +3,17 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const commentSchma = new Schema({
-    user_id: ObjectId,
-    target_id: ObjectId,
+    user_id: Schema.Types.ObjectId,
+    target_id: Schema.Types.ObjectId,
     content: String,
-    likes: [ObjectId],
+    likes: [Schema.Types.ObjectId],
     create_time: Date,
-    parent_id: Object_id,
-    parent_type: String
+    parent_type: String,
+    authid: Schema.Types.ObjectId,
+    userMsg: Object
 });
 
 
-const Comment = mongoose.model('Comment', userSchma,'comment');
+const Comment = mongoose.model('Comment', commentSchma,'comment');
 
 export default Comment;
