@@ -3,14 +3,13 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const commentSchma = new Schema({
-    user_id: Schema.Types.ObjectId,
-    target_id: Schema.Types.ObjectId,
+    user_id: { type: Schema.Types.ObjectId, ref: 'User'},
+    target_id: { type: Schema.Types.ObjectId, ref: 'Comment'},
     content: String,
-    likes: [Schema.Types.ObjectId],
+    likes: [{ type: Schema.Types.ObjectId, ref: 'User'}],
     create_time: Date,
     parent_type: String,
-    authid: Schema.Types.ObjectId,
-    userMsg: Object
+    authid: { type: Schema.Types.ObjectId, ref: 'User'},
 });
 
 

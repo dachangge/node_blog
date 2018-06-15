@@ -43,7 +43,8 @@ class Topic extends BaseComponent{
                 tags: [],
                 looks: 0,
                 title: req.body.title,
-                type: req.body.type
+                type: req.body.type,
+                recently_reply_time: new Date()
             },(err, doc) => {
                 if (err) {
                     res.send(new BaseResult({code: 0, description: '服务器异常'}));
@@ -57,46 +58,14 @@ class Topic extends BaseComponent{
     }
     async queryTopicById(req, res, next){
         try{
-            let item = {};
-            let doc = await TopicModel.findOneAndUpdate({_id: req.body.id},{$inc:{looks: 1}});
-            if(doc){
-                item= {
-                    content: doc.content,
-                    create_time: doc.create_time,
-                    likes: doc.likes,
-                    looks: doc.looks,
-                    replays: doc.replays,
-                    tags: doc.tags,
-                    title: doc.title,
-                    type: doc.type,
-                    user_id: doc.user_id,
-                    _id: doc._id
+            let doc = await TopicModel.findOneAndUpdate({_id: req.body.id},{$inc:{looks: 1}}).populate('user_id').populate('likes').populate({
+                path: 'replays',
+                populate:{
+                    path: 'user_id'
                 }
-                const user = await UserModel.findOne({_id: doc.user_id});
-                if(user){
-                    item.userMsg = user;
-                }
-                else{
-                    throw new Error('获取回复信息失败');
-                    return
-                }
-                let promises = [];
-                doc.replays.forEach(it => {
-                    promises.push(CommentModel.findOne({_id: it}));
-                })
-                Promise.all(promises).then(allRes => {
-                    item.replay_arr = allRes;
-                    res.send(new BaseResult({code: 1, description: '查询成功', result: item}));
-                    return
-                }).catch(allReject =>{
-                    item.replay_status = '获取回复信息失败';
-                    res.send(new BaseResult({code: 1, description: '查询成功', result: item}));
-                    return
-                })
-            }else{ne
-                throw new Error('获取回复信息失败');
-                return
-            }
+            });
+            console.log(doc);
+            res.send(new BaseResult({code: 1, description: '查询成功', result: doc}))
         }catch (e) {
             res.send(new BaseResult({code: 0, description: e.message}));
         }
@@ -104,18 +73,16 @@ class Topic extends BaseComponent{
     }
     async queryTopicByType(req, res, next){
         let item = {type: req.body.type};
-        if(!item){
+        if(req.body.type === 'all'){
             item = {};
         }
         try{
-            let topics = await TopicModel.find({}).populate('user_id');
-            console.log(topics);
-            res.send(new BaseResult({code: 1, result: topics}));
+            let count = await TopicModel.count(item);
+            let topics = await TopicModel.find(item,'user_id tags replays type looks title recently_reply_time').sort({recently_reply_time: -1}).populate('user_id');
+            res.send(new BaseResult({code: 1, result: {list: topics, count: count}}));
         }catch(e){
             res.send(new BaseResult({code: 0, description: e.message}));
-
         }
-
     }
 }
 export default new Topic();

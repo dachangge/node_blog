@@ -7,11 +7,12 @@ const topicSchma = new Schema({
     content: String,
     user_id: {type:Schema.Types.ObjectId, ref: 'User'},
     tags:[String],
-    likes:[Schema.Types.ObjectId],
-    replays:[Schema.Types.ObjectId],
+    likes:[{type: Schema.Types.ObjectId,ref: 'User'}],
+    replays:[{type:Schema.Types.ObjectId,ref: 'Comment'}],
     type: String,
     looks: Number,
     title: String,
+    recently_reply_time: Date
 });
 
 

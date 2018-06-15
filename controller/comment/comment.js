@@ -11,22 +11,22 @@ class Comment extends BaseComponent{
                 throw new Error('请输入回复内容');
                 return
             }
-            let userMsg = await UserModel.findOne({_id: req.session.userid});
             let item = {
                 user_id: req.session.userid,
-                target_id: req.body._id,
                 content: req.body.content,
                 create_time: new Date(),
                 parent_type: req.body.type,
-                userMsg: userMsg
             };
             if(req.body.type === 'topic'){
-                item.authid = req.body.authid;
+                item.authid = req.body.authid; //回复主题
+            }
+            if(req.body.type === 'comment'){
+                item.target_id = req.body.target_id; //回复评论
             }
             let newCom = await CommentModel.create(item);
             if(newCom){
                 if(req.body.type === 'topic'){
-                    let top = await TopicModel.findOneAndUpdate({_id: req.body._id},{$push:{replays: newCom._id}});
+                    let top = await TopicModel.findOneAndUpdate({_id: req.body._id},{$push:{replays: newCom._id},$set:{recently_reply_time: newCom.create_time}});
                     if(top){
                         res.send(new BaseResult({code: 1, description:'回复成功', result: newCom}));
                     }

@@ -11,23 +11,17 @@ class User {
                 throw new Error('用户名不能为空');
             else if (!req.body.true_name)
                 throw new Error('真实姓名不能为空');
+            let user = await UserModel.findOneAndUpdate({_id: req.session.userid},{
+                user_name: req.body.user_name,
+                true_name: req.body.true_name,
+                phone: req.body.phone,
+                autograph: req.body.autograph,
+            });
+            res.send(new BaseResult({code: 1, description: '用户信息修改成功', result: user}));
         }catch(err){
             res.send(new BaseResult({code: 0, description: err.message}));
         }
-        let user = await UserModel.findOneAndUpdate({_id: req.session.userid},{
-            user_name: req.body.user_name,
-            true_name: req.body.true_name,
-            phone: req.body.phone,
-            autograph: req.body.autograph,
-        })
-        console.log(user);
-        CommentModel.updateMany({user_id: req.session.userid},{userMsg: user},(err,doc) => {
-            if(!err){
-                res.send(new BaseResult({code: 1, description: '用户信息修改成功', result: user}));
-            }else{
-                res.send(new BaseResult({code: 0, description: '修改用户信息失败'}));
-            }
-        })
+
     }
     async changePsd(req, res, next) {
         try {
@@ -124,8 +118,13 @@ class User {
                     res.send(new BaseResult({code: 0, description: err.message}))
                 }else{
                     console.log(doc)
-                    req.session.userid = doc._id;
-                    res.send(new BaseResult({code: 1, description: '成功登录'}))
+                    if(doc){
+                        req.session.userid = doc._id;
+                        res.send(new BaseResult({code: 1, description: '成功登录'}))
+                    }else{
+                        res.send(new BaseResult({code: 0, description: '用户名或密码不正确'}))
+                    }
+
                 }
             });
         }catch(err){
