@@ -45,7 +45,6 @@ class File{
            if(files && files.file){
                let file = files.file;
                let key = new Date().getTime()+ '_' + file.name;
-
                 fs.renameSync(files.file.path, 'public/images/' + key);
                 let token = this.uptoken('public/images/' + key);
                 this.uploadFile(token,'public/images/'+key,'public/images/' + key).then(r => {
