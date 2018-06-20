@@ -25,11 +25,9 @@ class Comment extends BaseComponent{
             }
             let newCom = await CommentModel.create(item);
             if(newCom){
-                if(req.body.type === 'topic'){
-                    let top = await TopicModel.findOneAndUpdate({_id: req.body._id},{$push:{replays: newCom._id},$set:{recently_reply_time: newCom.create_time}});
-                    if(top){
-                        res.send(new BaseResult({code: 1, description:'回复成功', result: newCom}));
-                    }
+                let top = await TopicModel.findOneAndUpdate({_id: req.body._id},{$push:{replays: newCom._id},$set:{recently_reply_time: newCom.create_time}});
+                if(top){
+                    res.send(new BaseResult({code: 1, description:'回复成功', result: newCom}));
                 }
             }
         }catch(err){

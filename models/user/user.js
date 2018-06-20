@@ -8,7 +8,8 @@ const userSchma = new Schema({
     create_time: Date,
     true_name: String,
     phone: String,
-    autograph: String //个性签名
+    autograph: String, //个性签名
+    header_url: String
 });
 
 const User = mongoose.model('User', userSchma,'user');

@@ -86,7 +86,8 @@ class User {
                     true_name: req.body.true_name,
                     pass_word: req.body.pass_word,
                     phone: req.body.phone,
-                    create_time: new Date()
+                    create_time: new Date(),
+                    header_url: 'http://paaw1qnws.bkt.clouddn.com/public/images/1529493779865_23630003.png'
                 }, (err, docs) => {
                     if (err) {
                         res.send(new BaseResult({code: 0, description: '服务器异常'}));
