@@ -9,5 +9,6 @@ router.post('/saveUser', User.saveUser);
 router.post('/changePsd', User.changePsd);
 router.post('/login', User.userLogin);
 router.post('/loginOut', User.userLoginOut);
+router.post('/headerUrlUpload', User.headerUrlUpload)
 
 module.exports = router;

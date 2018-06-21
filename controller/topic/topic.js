@@ -64,7 +64,6 @@ class Topic extends BaseComponent{
                     path: 'user_id'
                 }
             });
-            console.log(doc);
             res.send(new BaseResult({code: 1, description: '查询成功', result: doc}))
         }catch (e) {
             res.send(new BaseResult({code: 0, description: e.message}));

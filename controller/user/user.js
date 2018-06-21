@@ -1,6 +1,7 @@
 import UserModel from '../../models/user/user'
 import {BaseResult} from "../../prototype/baseResult";
-import CommentModel from "../../models/comment/comment";
+import formidable from 'formidable';
+import File from '../file/file'
 class User {
     constructor() {
         this.createUser = this.createUser.bind(this);
@@ -143,6 +144,47 @@ class User {
             res.send(new BaseResult({code: 0, description: '系统异常'}))
         }
 
+    }
+    async headerUrlUpload(req, res, next) {
+        let form =new formidable.IncomingForm();
+        form.uploadDir = './public/images';
+        form.parse(req,(err, fields, files) => {
+            if(err){
+                res.send(new BaseResult({code: 0, description: '文件解析失败'}));
+                return ;
+            }
+            console.log(fields);
+            if(!fields || !fields._id){
+                res.send(new BaseResult({code: 9999, description: '当前未登录'}))
+            }
+            if(files && files.file){
+                let file = files.file;
+                File.qiqiu(file).then(r => {
+                    console.log(r, req.session);
+                    if(r.code === 1){
+                        UserModel.findOneAndUpdate({_id: fields._id},{
+                            header_url: r.result.url
+                        },(err,doc) => {
+                            console.log(doc);
+                            if(err){
+                                res.send(new BaseResult({code: 0, description: err.message}));
+                            }else{
+                                res.send(new BaseResult({code: 1, description: '头像上传成功',result: r.result.url}));
+                            }
+                        })
+                    }
+                    else{
+                        res.send(r);
+                    }
+                }).catch((e)=> {
+                    res.send(new BaseResult({code: 0, description: e.message}));
+                })
+            }
+            else{
+                res.send(new BaseResult({code: 0, description: '文件解析失败'}));
+                return ;
+            }
+        })
     }
 
 }

@@ -4,7 +4,6 @@ import UserModel from '../models/user/user'
 export class BaseComponent{
     async checkUser(req, res, next){
         const userid = req.session.userid;
-        console.log(userid)
         if (!userid) {
             res.send(new BaseResult({code : 9999, description: '请先登录'}))
             return
