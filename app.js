@@ -5,8 +5,11 @@ import connectMongo from 'connect-mongo';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import cors from 'cors';
+import path from 'path';
+import socket from 'socket.io'
+import http from 'http';
 
-import db from './mongodb/db';
+import './mongodb/db';
 
 const app = new express();
 
@@ -53,7 +56,34 @@ app.use(bodyParser.json());
 //     res.send('hello world');
 // });
 router(app);
+app.use(express.static(path.join(__dirname, 'dist')))
 
-app.listen(3000, () => {
+
+
+
+
+const server = app.listen(3000, () => {
     console.log('监听成功,端口3000');
+})
+
+//SOCKET.IO
+
+const io = socket.listen(server);
+
+io.on('connection', (socket) => {
+    //接收并处理客户端的hi事件
+    socket.on('hi', function(data) {
+        console.log('触发hi事件',data);
+
+        //触发客户端事件c_hi
+        socket.emit('c_hi','hello too!')
+    })
+
+    //断开事件
+    socket.on('disconnect', function(data) {
+        console.log('断开',data)
+        socket.emit('c_leave','离开');
+        //socket.broadcast用于向整个网络广播(除自己之外)
+        //socket.broadcast.emit('c_leave','某某人离开了')
+    })
 })

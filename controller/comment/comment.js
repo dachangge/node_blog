@@ -16,12 +16,12 @@ class Comment extends BaseComponent{
                 content: req.body.content,
                 create_time: new Date(),
                 parent_type: req.body.type,
+                topic_id: req.body._id,
+                authid: req.body.authid,  //回复的人的id
+                status: false
             };
-            if(req.body.type === 'topic'){
-                item.authid = req.body.authid; //回复主题
-            }
             if(req.body.type === 'comment'){
-                item.target_id = req.body.target_id; //回复评论
+                item.target_id = req.body.target_id; //回复的评论的id
             }
             let newCom = await CommentModel.create(item);
             if(newCom){
@@ -33,6 +33,17 @@ class Comment extends BaseComponent{
         }catch(err){
             res.send(new BaseResult({code: 0, description: err.message}))
         }
+    }
+    async queryCommentByUserId(req, res, next) {
+        try{
+            let comments = await CommentModel.find({authid: req.session.userid},'authid topic_id user_id status parent_type').populate('authid').populate('topic_id','title _id').populate('user_id');
+            console.log(comments);
+            res.send(new BaseResult({code: 1, description:'查询成功', result: comments}));
+        }
+        catch(error){
+            res.send(new BaseResult({code: 0, description:error.message}));
+        }
+
     }
 }
 export default new Comment();
