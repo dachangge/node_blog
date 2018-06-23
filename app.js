@@ -69,21 +69,21 @@ const server = app.listen(3000, () => {
 //SOCKET.IO
 
 const io = socket.listen(server);
-
-io.on('connection', (socket) => {
+export let sockets = [];
+export const so = io.on('connection', (socket) => {
     //接收并处理客户端的hi事件
-    socket.on('hi', function(data) {
-        console.log('触发hi事件',data);
-
-        //触发客户端事件c_hi
-        socket.emit('c_hi','hello too!')
+    socket.on('loginin', function(data) {
+        sockets.push({session: data, socket: socket.id});
+        console.log(sockets);
+        socket.emit('c_hi',socket.id);
     })
 
     //断开事件
     socket.on('disconnect', function(data) {
         console.log('断开',data)
+        let idx = sockets.findIndex(it => it.socket == socket.id);
+        if(idx !== -1)
+            sockets.splice(idx,1);
         socket.emit('c_leave','离开');
-        //socket.broadcast用于向整个网络广播(除自己之外)
-        //socket.broadcast.emit('c_leave','某某人离开了')
     })
 })

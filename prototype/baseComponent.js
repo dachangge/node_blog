@@ -1,5 +1,6 @@
 import {BaseResult} from "./baseResult";
 import UserModel from '../models/user/user'
+import {so} from '../app'
 
 export class BaseComponent{
     async checkUser(req, res, next){
@@ -13,6 +14,7 @@ export class BaseComponent{
                 res.send(new BaseResult({code : 9999, description: '请先登录'}));
                 return
             }
+            so.emit('c_hi',456);
         }
         next()
     }

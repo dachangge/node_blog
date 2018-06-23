@@ -3,6 +3,7 @@ import {BaseResult} from "../../prototype/baseResult";
 import CommentModel from "../../models/comment/comment"
 import TopicModel from "../../models/topic/topic";
 import UserModel from "../../models/user/user";
+import {so,sockets} from './../../app'
 
 class Comment extends BaseComponent{
     async addComment(req, res, next){
@@ -27,6 +28,11 @@ class Comment extends BaseComponent{
             if(newCom){
                 let top = await TopicModel.findOneAndUpdate({_id: req.body._id},{$push:{replays: newCom._id},$set:{recently_reply_time: newCom.create_time}});
                 if(top){
+                    let socket = sockets.find(it => it.session === req.body.authid);
+                    console.log(socket, so.sockets);
+                    if(socket){
+                        so.sockets[socket.socket].emit('sendComment',{commentid: newCom._id})
+                    }
                     res.send(new BaseResult({code: 1, description:'回复成功', result: newCom}));
                 }
             }
