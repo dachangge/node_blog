@@ -42,14 +42,26 @@ class Comment extends BaseComponent{
     }
     async queryCommentByUserId(req, res, next) {
         try{
-            let comments = await CommentModel.find({authid: req.session.userid},'authid topic_id user_id status parent_type').populate('authid').populate('topic_id','title _id').populate('user_id');
+            let comments = await CommentModel.find({authid: req.session.userid},'authid topic_id user_id status parent_type').populate('authid').populate('topic_id','title _id').populate('user_id').sort({create_time: -1});
             console.log(comments);
             res.send(new BaseResult({code: 1, description:'查询成功', result: comments}));
+            return
         }
         catch(error){
             res.send(new BaseResult({code: 0, description:error.message}));
+            return
         }
-
+    }
+    async readComment(req, res, next) {
+        try{
+            let comment = await CommentModel.findOneAndUpdate({_id: req.body.id},{status: true});
+            console.log(comment);
+            res.send(new BaseResult({code: 1, description: '', result: comment}));
+            return
+        }catch (error) {
+            res.send(new BaseResult({code: 0, description: error.message}));
+            return
+        }
     }
 }
 export default new Comment();

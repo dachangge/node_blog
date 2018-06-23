@@ -48,12 +48,15 @@ class Topic extends BaseComponent{
             },(err, doc) => {
                 if (err) {
                     res.send(new BaseResult({code: 0, description: '服务器异常'}));
+                    return
                 } else {
                     res.send(new BaseResult({code: 1, description: '话题发布成功', result: {_id: doc._id}}));
+                    return
                 }
             })
         }catch (e) {
             res.send(new BaseResult({code: 0, description: e.message}));
+            return
         }
     }
     async queryTopicById(req, res, next){
